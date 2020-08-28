@@ -13,6 +13,6 @@ def returnTweets(folder):
             # Save tweet data as json file
             tweet = json.load(f)
             # Only add tweet to list if its not a retweet or reply
-            if not tweet['is_retweet'] and not tweet['is_reply']:
+            if not tweet['is_retweet'] and not tweet['is_reply'] and tweet['text'][0] not in ['.', '#', '@', '"', '“']:
                 tweets.append(tweet)
     return tweets

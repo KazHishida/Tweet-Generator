@@ -31,14 +31,14 @@ class MarkovChain():
         while True:
             for order in range(-maxOrder, 0):
                 initialState = ' '.join(text[order:len(text)])
-                if initialState in self.model and sum(self.model[initialState].values())>2:
+                if initialState in self.model and sum(self.model[initialState].values())>1:
                     break
             # Create list of potential states and probabilities
             nextStates = list(self.model[initialState].keys())
             nextProbs = list(self.model[initialState].values())
             # Select the next state using nextStates and nextProbs
             nextState = random.choices(nextStates, nextProbs)[0]
-            print(f'Chosen word: {nextState} from {initialState} out of {self.model[initialState]}')
+            print(f'Chosen word: "{nextState}" from "{initialState}" out of {self.model[initialState]}')
             # Check if None, if not, append, if so, break
             if nextState:
                 text.append(nextState)
