@@ -14,18 +14,6 @@ parser.add_argument("--load-folder")
 parser.add_argument("--save-folder")
 args = parser.parse_args()
 
-auth = tweepy.OAuthHandler('HSpiivW44gNpuSEkTmrVIbOVy', '3EwTkcxBNmlcBzrbfpS4A61jsUVOaOYlbM5ZjH7e7JHDh7SdiX')
-auth.set_access_token('2956699122-VOnyhXkDCiV3hjGLAVCSzvrPb6zHIKEs89WvGpy', 'jNeculRn0RRfQ2a0riO0Ep5htt73luNZnpIeJGPgZMIpO')
-
-api = tweepy.API(auth)
-
-class MyStreamListener(tweepy.StreamListener):
-    def on_status(self, status):
-        print(status.text)
-
-myStreamListener = MyStreamListener()
-myStream = tweepy.Stream(auth = api.auth, listener=myStreamListener)
-
 def initializeModel():
     if not args.generate_model:
         model = markov_chain.MarkovChain(initialize=False)
