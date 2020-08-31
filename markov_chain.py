@@ -1,7 +1,7 @@
 import random
 import json
 
-maxOrder = 3
+maxOrder = 3 # Maximum order for variable order markov chain
 
 class MarkovChain():
     def __init__(self, tweets=None, initialize=True):
@@ -13,6 +13,9 @@ class MarkovChain():
             tokenList = [tweet['text'].split() for tweet in self.tweets]
             self.processTokens(tokenList)
     def processTokens(self, tokenList):
+        '''
+        Going through every word in every tweet in list, add states to the model
+        '''
         for order in range(maxOrder):
             for tweet in tokenList:
                 self.initialStates.append(tweet[0])
@@ -22,12 +25,18 @@ class MarkovChain():
                     self.addToModel(state, nextState)
                 self.addToModel(tweet[-1], None)
     def addToModel(self, state, nextState):
+        '''
+        Given the initial state and next state, add to model
+        '''
         if state not in self.model:
             self.model[state] = {}
         if nextState not in self.model[state]:
             self.model[state][nextState] = 0
         self.model[state][nextState] += 1
     def generateInput(self):
+        '''
+        Generate a random input given the model and list of possible initial states
+        '''
         # Initialize text as list containing a random initial state
         text = [random.choice(self.initialStates)]
         # Main loop to create string
@@ -41,7 +50,6 @@ class MarkovChain():
             nextProbs = list(self.model[initialState].values())
             # Select the next state using nextStates and nextProbs
             nextState = random.choices(nextStates, nextProbs)[0]
-            #print(f'Chosen word: "{nextState}" from "{initialState}" out of {self.model[initialState]}')
             # Check if None, if not, append, if so, break
             if not nextState or nextState=='null':
                 break
@@ -49,6 +57,7 @@ class MarkovChain():
                 text.append(nextState)
         # Convert list to text and return
         return ' '.join(text)
+    # Save and load models given folder name to store models in
     def saveModel(self, modelLocation):
         with open(f'{modelLocation}\model.txt', 'w', encoding='utf-8') as outfile:
             json.dump(self.model, outfile)

@@ -5,6 +5,7 @@ import argparse
 import base64
 import json
 
+# Accept command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--ip')
 parser.add_argument("--port")
@@ -13,6 +14,7 @@ parser.add_argument("--load-folder")
 parser.add_argument("--save-folder")
 args = parser.parse_args()
 
+# Initialize markov chain model
 def initializeModel():
     if not args.generate_model:
         model = markov_chain.MarkovChain(initialize=False)
@@ -25,21 +27,17 @@ def initializeModel():
     return model
 
 if __name__ == '__main__':
-
     # Initialize Markov Chain
     model = initializeModel()
-
     # Create an IPv4 TCP socket
     serverSocket = socket(AF_INET, SOCK_STREAM)
-
     # Prepare a sever socket
     serverSocket.bind((args.ip, int(args.port)))  # second command line arg for port
-
     # Listen for connections from client
     serverSocket.listen(1)
-
+    # Wait for instructions
     while True:
-        # Establish the connection
+        # Establish connection
         print("Waiting...")
         connectionSocket, addr = serverSocket.accept()
         try:
@@ -57,6 +55,7 @@ if __name__ == '__main__':
                     connectionSocket.send(str.encode(newInput))
                 # If request is a POST request:
                 elif message.decode('utf-8').split()[0] == "POST":
+                    # Print tweet
                     print(base64.b64decode(message.split()[1]).decode('utf-8'))
                     # Process input and send confirmation
                     model.processTokens([base64.b64decode(message.split()[1]).decode('utf-8')])
@@ -67,14 +66,5 @@ if __name__ == '__main__':
                 connectionSocket.send(b'ERROR')
         except KeyboardInterrupt:  # User pressed Ctrl+C, exit gracefully
             break
-
     # Close server connection
     serverSocket.close()
-
-
-#API Key
-#HSpiivW44gNpuSEkTmrVIbOVy
-#API Secret Key
-#3EwTkcxBNmlcBzrbfpS4A61jsUVOaOYlbM5ZjH7e7JHDh7SdiX
-#Bearer Token
-#AAAAAAAAAAAAAAAAAAAAAOn%2BHAEAAAAAc%2F5uYnFwVos7v1h%2BTd1ZsBe2nZA%3DvfUIaSi8rTP2wr4pkpvGHFGYGwvUpT9d5jJaxRFaxRMsUkyXfn
