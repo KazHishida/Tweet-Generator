@@ -4,7 +4,6 @@ from socket import *
 import argparse
 import base64
 import json
-import tweepy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--ip')
