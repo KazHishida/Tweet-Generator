@@ -1,21 +1,24 @@
 import random
+import json
+
 maxOrder = 3
 
 class MarkovChain():
-    def __init__(self, tweets):
+    def __init__(self, tweets=None, initialize=True):
         self.tweets = tweets
         self.model = {}
         self.initialStates = []
         # Create a list of tweets tokenized by word, then process it to add to markov chain
-        tokenList = [tweet['text'].split() for tweet in self.tweets]
-        self.processTokens(tokenList)
+        if initialize:
+            tokenList = [tweet['text'].split() for tweet in self.tweets]
+            self.processTokens(tokenList)
     def processTokens(self, tokenList):
-         for order in range(maxOrder):
+        for order in range(maxOrder):
             for tweet in tokenList:
                 self.initialStates.append(tweet[0])
-                for tokenIndex in range(len(tweet)-order):
-                    state = ' '.join(tweet[tokenIndex:tokenIndex+order])
-                    nextState = tweet[tokenIndex+order]
+                for tokenIndex in range(len(tweet) - order):
+                    state = ' '.join(tweet[tokenIndex:tokenIndex + order])
+                    nextState = tweet[tokenIndex + order]
                     self.addToModel(state, nextState)
                 self.addToModel(tweet[-1], None)
     def addToModel(self, state, nextState):
@@ -31,18 +34,28 @@ class MarkovChain():
         while True:
             for order in range(-maxOrder, 0):
                 initialState = ' '.join(text[order:len(text)])
-                if initialState in self.model and sum(self.model[initialState].values())>1:
+                if initialState in self.model and sum(self.model[initialState].values()) > 1:
                     break
             # Create list of potential states and probabilities
             nextStates = list(self.model[initialState].keys())
             nextProbs = list(self.model[initialState].values())
             # Select the next state using nextStates and nextProbs
             nextState = random.choices(nextStates, nextProbs)[0]
-            print(f'Chosen word: "{nextState}" from "{initialState}" out of {self.model[initialState]}')
+            #print(f'Chosen word: "{nextState}" from "{initialState}" out of {self.model[initialState]}')
             # Check if None, if not, append, if so, break
-            if nextState:
-                text.append(nextState)
-            else:
+            if not nextState or nextState=='null':
                 break
+            else:
+                text.append(nextState)
         # Convert list to text and return
         return ' '.join(text)
+    def saveModel(self, modelLocation):
+        with open(f'{modelLocation}\model.txt', 'w', encoding='utf-8') as outfile:
+            json.dump(self.model, outfile)
+        with open(f'{modelLocation}\initialStates.txt', 'w', encoding='utf-8') as outfile:
+            json.dump(self.initialStates, outfile)
+    def loadModel(self, modelLocation):
+        with open(f'{modelLocation}\model.txt', 'r', encoding='utf-8') as outfile:
+            self.model = json.load(outfile)
+        with open(f'{modelLocation}\initialStates.txt', 'r', encoding='utf-8') as outfile:
+            self.initialStates = json.load(outfile)
